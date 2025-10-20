@@ -3,6 +3,10 @@
 #include "vglobals.h"
 #include "natives.h"
 
+#define SMEXT_CONF_MINIMUM_API_VERSION SMINTERFACE_EXTENSIONAPI_VERSION
+#define SMEXT_CONF_COMPATIBLE_SM_VERSION 12
+
+
 CDODHooks g_Interface;
 SMEXT_LINK(&g_Interface)
 
