@@ -1,0 +1,51 @@
+name: Build DoDHooks (SM 1.12+ Linux)
+
+on:
+  push:
+    branches:
+      - sm12-linux
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential python3 python3-pip git wget unzip
+          pip install ambuild
+
+      - name: Fetch SourceMod 1.12 SDK
+        run: |
+          mkdir -p sdk
+          cd sdk
+          wget https://sm.alliedmods.net/smdrop/1.12/sourcemod-1.12.0-git7031-linux.tar.gz
+          tar -xzf sourcemod-1.12.0-git7031-linux.tar.gz
+          mv addons/sourcemod/public .
+          mv addons/sourcemod/core .
+          rm -rf addons
+
+      - name: Build DoDHooks
+        run: |
+          mkdir build
+          cd build
+          python3 ../configure.py --sdks=sdk --enable-optimize
+          ambuild
+
+      - name: Package build artifact
+        run: |
+          cd build
+          zip -r ../dodhooks-sm12-linux.zip package gamedata || true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dodhooks-sm12-linux
+          path: dodhooks-sm12-linux.zip
